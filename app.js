@@ -1,3 +1,6 @@
+"use strict";
+
+// Исходные данные задания (сохранены без изменений).
 const sourceJson = `{
   "event": {
     "title": "Ночь в музее",
@@ -13,82 +16,113 @@ const sourceJson = `{
   ]
 }`;
 
-let data = null;
-try {
-  data = JSON.parse(sourceJson);
-} catch (err) {
-  data = null;
+function parseSource() {
+  try {
+    return JSON.parse(sourceJson);
+  } catch (err) {
+    return null;
+  }
 }
 
-const showProgramButton = document.querySelector('#show-program');
-const programBlock = document.querySelector('#program');
-const serviceForm = document.querySelector('#service-form');
-const choiceError = document.querySelector('#choice-error');
-const dataError = document.querySelector('#data-error');
-const resultBlock = document.querySelector('#result');
-const reportJsonBlock = document.querySelector('#report-json');
-
+// Отчёт по выбранным услугам: filter -> map (деструктуризация, trim) -> reduce.
 function buildReport(services, guideChecked, audioChecked, catalogChecked) {
-  const flags = { guide: guideChecked, audio: audioChecked, catalog: catalogChecked };
-  const chosen = services.filter(function (service) {
-    return flags[service.id] === true;
-  });
-  const items = chosen.map(function ({ title, price }) {
-    return { title: title.trim(), price: price };
-  });
-  const total = items.reduce(function (sum, { price }) {
-    return sum + price;
-  }, 0);
-  return {
-    count: items.length,
-    total: total,
-    items: items
+  const selected = {
+    guide: guideChecked,
+    audio: audioChecked,
+    catalog: catalogChecked,
   };
+
+  const items = services
+    .filter((service) => selected[service.id])
+    .map(({ title, price }) => ({ title: title.trim(), price }));
+
+  const total = items.reduce((sum, { price }) => sum + price, 0);
+
+  return { count: items.length, total, items };
 }
+
+const ui = {
+  programButton: document.querySelector("#show-program"),
+  program: document.querySelector("#program"),
+  form: document.querySelector("#service-form"),
+  guide: document.querySelector("#guide"),
+  audio: document.querySelector("#audio"),
+  catalog: document.querySelector("#catalog"),
+  choiceError: document.querySelector("#choice-error"),
+  dataError: document.querySelector("#data-error"),
+  result: document.querySelector("#result"),
+  reportJson: document.querySelector("#report-json"),
+};
+
+// Показ итога и JSON-строки, скрытие ошибки выбора.
+function showResult(report) {
+  const titles = report.items.map(({ title }) => title).join("<br>");
+  ui.result.innerHTML =
+    "Выбрано услуг: " +
+    report.count +
+    "<br>Итого: " +
+    report.total +
+    " руб.<br>" +
+    titles;
+
+  // JSON.stringify, проверка обратным JSON.parse
+  ui.reportJson.textContent = JSON.stringify(
+    JSON.parse(JSON.stringify(report)),
+  );
+
+  ui.choiceError.hidden = true;
+  ui.result.hidden = false;
+  ui.reportJson.hidden = false;
+}
+
+// Ошибка пустого выбора: итог и JSON скрыты.
+function showChoiceError() {
+  ui.choiceError.textContent = "Выберите хотя бы одну услугу.";
+  ui.result.hidden = true;
+  ui.reportJson.hidden = true;
+  ui.choiceError.hidden = false;
+}
+
+function onShowProgramClick() {
+  const data = parseSource();
+  if (data === null) {
+    return;
+  }
+  ui.program.innerHTML = data.event.meeting;
+  ui.program.hidden = false;
+}
+
+function onFormSubmit(event) {
+  event.preventDefault();
+
+  const data = parseSource();
+  if (data === null) {
+    return;
+  }
+
+  const report = buildReport(
+    data.services,
+    ui.guide.checked,
+    ui.audio.checked,
+    ui.catalog.checked,
+  );
+
+  if (report.count === 0) {
+    showChoiceError();
+  } else {
+    showResult(report);
+  }
+}
+
+// Запуск: при повреждённом JSON — ошибка данных, при корректном — видна только форма.
+const data = parseSource();
 
 if (data === null) {
-  dataError.hidden = false;
-  serviceForm.hidden = true;
+  ui.dataError.textContent = "Ошибка данных.";
+  ui.dataError.hidden = false;
 } else {
-  serviceForm.hidden = false;
-
-  showProgramButton.addEventListener('click', function () {
-    programBlock.innerHTML = data.event.meeting;
-    programBlock.hidden = false;
-  });
-
-  serviceForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    const guideChecked = document.querySelector('#guide').checked;
-    const audioChecked = document.querySelector('#audio').checked;
-    const catalogChecked = document.querySelector('#catalog').checked;
-
-    const report = buildReport(data.services, guideChecked, audioChecked, catalogChecked);
-
-    if (report.count === 0) {
-      choiceError.hidden = false;
-      resultBlock.hidden = true;
-      reportJsonBlock.hidden = true;
-      return;
-    }
-
-    choiceError.hidden = true;
-
-    const lines = [
-      'Выбрано услуг: ' + report.count,
-      'Итого: ' + report.total + ' руб.'
-    ];
-    report.items.forEach(function (item) {
-      lines.push(item.title);
-    });
-    resultBlock.innerHTML = lines.join('<br>');
-
-    const jsonString = JSON.stringify(report);
-    JSON.parse(jsonString);
-    reportJsonBlock.textContent = jsonString;
-
-    resultBlock.hidden = false;
-    reportJsonBlock.hidden = false;
-  });
+  ui.form.hidden = false;
 }
+
+ui.programButton.addEventListener("click", onShowProgramClick);
+ui.form.addEventListener("submit", onFormSubmit);

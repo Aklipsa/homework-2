@@ -1,87 +1,102 @@
+/* Палитра проекта — задана на селекторе элемента body */
 body {
-  background-color: #f4f6fa;
-  color: #22223b;
-  font-family: Arial, sans-serif;
+  --bg: #f4f6fa;
+  --card-bg: #ffffff;
+  --text: #24292f;
+  --muted: #57606a;
+  --blue: #007bff;
+  --blue-dark: #0069d9;
+  --green: #1bdb21;
+  --red: #dc3545;
+  --border: #d0d7de;
+
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 16px;
+  line-height: 1.5;
   margin: 0;
-  padding: 24px;
+  padding: 32px;
 }
 
-h1 {
-  color: #007bff;
-  font-size: 28px;
-  margin-top: 0;
-}
-
+/* Карточка события */
 .card {
-  background-color: #ffffff;
-  border: 1px solid #d8dee9;
-  padding: 16px;
-  margin-bottom: 24px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px; /* видимый внешний промежуток между карточкой и формой */
 }
 
-.event-date {
-  font-weight: bold;
-  margin: 0 0 4px 0;
+.card h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
 }
 
-.event-place {
-  margin: 0 0 4px 0;
+.card p {
+  margin: 4px 0;
+  color: var(--muted);
 }
 
-.event-description {
-  margin: 0 0 12px 0;
+.card button {
+  margin-top: 12px;
 }
 
+/* Блок программы */
 .program {
-  background-color: #eef7f0;
-  border: 1px solid #1f9d55;
+  background-color: #f6f8fa;
+  border: 1px solid var(--border);
   padding: 12px;
   margin-top: 12px;
 }
 
-.service-form {
-  background-color: #ffffff;
-  border: 1px solid #d8dee9;
-  padding: 16px;
-  margin-bottom: 16px;
+/* Форма выбора услуг */
+.form {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
 }
 
-.form-title {
-  font-weight: bold;
-  margin: 0 0 8px 0;
-}
-
-.service-option {
+.form label {
   display: block;
-  margin-bottom: 6px;
+  margin: 8px 0;
 }
 
-button {
-  background-color: #007bff;
-  color: #ffffff;
-  border: 1px solid #007bff;
-  padding: 8px 16px;
+.form button {
   margin-top: 8px;
 }
 
-.error {
-  color: #dc3545;
-  background-color: #fdecee;
-  border: 1px solid #dc3545;
-  padding: 8px;
-  margin-bottom: 12px;
-}
-
+/* Итог расчёта */
 .result {
-  background-color: #eef7f0;
-  border: 1px solid #1f9d55;
-  padding: 12px;
-  margin-bottom: 12px;
+  background-color: var(--card-bg);
+  border: 2px solid var(--green);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
 }
 
+/* JSON-строка отчёта */
 .report-json {
-  font-family: Consolas, monospace;
-  background-color: #f4f6fa;
-  border: 1px solid #d8dee9;
+  background-color: #f6f8fa;
+  border: 1px solid var(--border);
   padding: 12px;
+  margin: 0;
+}
+
+/* Области ошибок */
+.error {
+  color: var(--red);
+  padding: 8px 0;
+}
+
+/* Кнопки */
+button {
+  background-color: var(--blue);
+  color: #ffffff;
+  border: 1px solid var(--blue-dark);
+  border-radius: 6px;
+  padding: 8px 16px;
+  margin: 4px 0;
 }
